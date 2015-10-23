@@ -1,1 +1,1 @@
-# bloom-angular-seed
+# bloom-seed
