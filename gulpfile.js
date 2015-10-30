@@ -22,7 +22,12 @@ var files = {
   cssBundle: 'bloom-js-seed.min.css'
 };
 
-var paths = {
+var outputPaths = {
+  dist: proj.public,
+  scripts: 'js'
+};
+
+var inputPaths = {
   html: [ proj.source + 'index.html' ],
   images: [ proj.source + 'img/**/*' ],
   styles: [ proj.source + 'css/**/*.{css,less}' ],
@@ -30,16 +35,25 @@ var paths = {
   statics: [ proj.source + proj.static + '**/*' ],
   libs: [ proj.source + proj.lib + '**/*'],
   less: [ proj.source + 'css/**/*.less' ],
-  dist: proj.public
+  
 };
 
 // scripts - clean dist dir then annotate, minify, concat
 gulp.task('scripts', function() {
-  gulp.src(paths.scripts)
+  gulp.src(inputPaths.scripts)
     .pipe(gulpif(args.prod, uglify())).on('error', gutil.log)
     .pipe(concat(files.jsBundle)).on('error', gutil.log)
-    .pipe(gulp.dest(paths.dist + 'scripts'))
+    .pipe(gulp.dest(outputPaths.dist + outputPaths.scripts))
     .on('error', function (error) {
       console.error('' + error);
     });
+});
+
+// styles - min app css then copy min css to dist
+gulp.task('styles', function() {
+  gulp.src(paths.styles)
+    .pipe(gulpif(/[.]less$/, less())).on('error', gutil.log)
+    .pipe(minifyCss()).on('error', gutil.log)
+    .pipe(concat(files.appcss)).on('error', gutil.log)
+    .pipe(gulp.dest(paths.dist + 'css'));
 });
