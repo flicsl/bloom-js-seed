@@ -3,6 +3,8 @@ var gulpif = require('gulp-if');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
+var less = require('gulp-less');
+var minifyCss = require('gulp-minify-css');
 
 var args = require('yargs')
   .alias('p', 'prod')
@@ -24,7 +26,8 @@ var files = {
 
 var outputPaths = {
   dist: proj.public,
-  scripts: 'js'
+  scripts: 'js',
+  styles: 'css'
 };
 
 var inputPaths = {
@@ -51,9 +54,9 @@ gulp.task('scripts', function() {
 
 // styles - min app css then copy min css to dist
 gulp.task('styles', function() {
-  gulp.src(paths.styles)
+  gulp.src(inputPaths.styles)
     .pipe(gulpif(/[.]less$/, less())).on('error', gutil.log)
     .pipe(minifyCss()).on('error', gutil.log)
-    .pipe(concat(files.appcss)).on('error', gutil.log)
-    .pipe(gulp.dest(paths.dist + 'css'));
+    .pipe(concat(files.cssBundle)).on('error', gutil.log)
+    .pipe(gulp.dest(outputPaths.dist + outputPaths.styles));
 });
