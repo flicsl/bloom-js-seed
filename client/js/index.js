@@ -1,2 +1,3 @@
 var estrategia = 'luisa@rocha50!';
-alert(estrategia);
+var penalidade = 'isso é super extra!';
+alert(estrategia + penalidade);

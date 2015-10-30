@@ -5,6 +5,10 @@ var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
 var less = require('gulp-less');
 var minifyCss = require('gulp-minify-css');
+var browserify = require('gulp-browserify');
+
+// Test Dependencies
+var mochaPhantomjs = require('gulp-mocha-phantomjs');
 
 var args = require('yargs')
   .alias('p', 'prod')
@@ -19,15 +23,22 @@ var proj = {
   scss: './scss/'
 };
 
+var tests = {
+  source: './test/',
+  unit: 'client/'
+};
+
 var files = {
   jsBundle: 'bloom-js-seed.min.js',
-  cssBundle: 'bloom-js-seed.min.css'
+  cssBundle: 'bloom-js-seed.min.css',
+  testBundle: 'bloom-js-seed.test.js'
 };
 
 var outputPaths = {
   dist: proj.public,
+  test: tests.source,
   scripts: 'js',
-  styles: 'css'
+  styles: 'css',
 };
 
 var inputPaths = {
@@ -38,8 +49,10 @@ var inputPaths = {
   statics: [ proj.source + proj.static + '**/*' ],
   libs: [ proj.source + proj.lib + '**/*'],
   less: [ proj.source + 'css/**/*.less' ],
-  
+  unit: [ tests.source + tests.unit + '**/*test.js', '!' + outputPaths.test +  files.testBundle ]
 };
+
+gulp.task('default', ['scripts', 'styles', 'test', 'watch']);
 
 // scripts - clean dist dir then annotate, minify, concat
 gulp.task('scripts', function() {
@@ -59,4 +72,24 @@ gulp.task('styles', function() {
     .pipe(minifyCss()).on('error', gutil.log)
     .pipe(concat(files.cssBundle)).on('error', gutil.log)
     .pipe(gulp.dest(outputPaths.dist + outputPaths.styles));
+});
+
+gulp.task('watch', function() {
+  gulp.watch(inputPaths.scripts, ['scripts', 'test']);
+  gulp.watch(outputPaths.styles, ['styles']);
+});
+
+gulp.task('compile-test', function() {
+  return gulp.src(inputPaths.unit)
+    .pipe(browserify({
+      insertGlobals: true
+    }))
+    .pipe(concat(files.testBundle)).on('error', gutil.log)
+    .pipe(gulp.dest(outputPaths.test));
+});
+
+
+gulp.task('test', ['compile-test'], function() {
+  return gulp.src(outputPaths.test + 'index.html')
+    .pipe(mochaPhantomjs());
 });
