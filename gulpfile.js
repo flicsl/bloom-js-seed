@@ -40,6 +40,7 @@ var outputPaths = {
   test: tests.source,
   scripts: 'js',
   styles: 'css',
+  html : [ proj.public + '**/*.html' ]
 };
 
 var inputPaths = {
@@ -90,7 +91,7 @@ gulp.task('compile-test', function() {
     .pipe(gulp.dest(outputPaths.test));
 });
 
-gulp.task('scripts-watch', [], browserSync.reload);
+gulp.task('reload-browsers', [], browserSync.reload);
 
 gulp.task('serve', ['scripts', 'styles', 'test'], function () {
   browserSync.init({
@@ -99,8 +100,9 @@ gulp.task('serve', ['scripts', 'styles', 'test'], function () {
       }
   });
 
-  gulp.watch(inputPaths.scripts, ['scripts', 'test', 'scripts-watch']);
+  gulp.watch(inputPaths.scripts, ['scripts', 'test', 'reload-browsers']);
   gulp.watch(inputPaths.styles, ['styles']);
+  gulp.watch(outputPaths.html, ['reload-browsers']);
 });
 
 gulp.task('test', ['compile-test'], function() {
