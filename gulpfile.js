@@ -6,6 +6,7 @@ var gutil = require('gulp-util');
 var less = require('gulp-less');
 var minifyCss = require('gulp-minify-css');
 var browserify = require('gulp-browserify');
+var browserSync = require('browser-sync').create();
 
 // Test Dependencies
 var mochaPhantomjs = require('gulp-mocha-phantomjs');
@@ -71,12 +72,13 @@ gulp.task('styles', function() {
     .pipe(gulpif(/[.]less$/, less())).on('error', gutil.log)
     .pipe(minifyCss()).on('error', gutil.log)
     .pipe(concat(files.cssBundle)).on('error', gutil.log)
-    .pipe(gulp.dest(outputPaths.dist + outputPaths.styles));
+    .pipe(gulp.dest(outputPaths.dist + outputPaths.styles))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('watch', function() {
   gulp.watch(inputPaths.scripts, ['scripts', 'test']);
-  gulp.watch(outputPaths.styles, ['styles']);
+  gulp.watch(inputPaths.styles, ['styles']);
 });
 
 gulp.task('compile-test', function() {
@@ -88,6 +90,18 @@ gulp.task('compile-test', function() {
     .pipe(gulp.dest(outputPaths.test));
 });
 
+gulp.task('scripts-watch', [], browserSync.reload);
+
+gulp.task('serve', ['scripts', 'styles', 'test'], function () {
+  browserSync.init({
+      server: {
+          baseDir: outputPaths.dist
+      }
+  });
+
+  gulp.watch(inputPaths.scripts, ['scripts', 'test', 'scripts-watch']);
+  gulp.watch(inputPaths.styles, ['styles']);
+});
 
 gulp.task('test', ['compile-test'], function() {
   return gulp.src(outputPaths.test + 'index.html')

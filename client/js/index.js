@@ -1,3 +1,2 @@
-var estrategia = 'luisa@rocha50!';
-var penalidade = 'isso é super extra!';
-alert(estrategia + penalidade);
+var message = 'Welcome to Bloom\'s angular seed!';
+console.log(message);
