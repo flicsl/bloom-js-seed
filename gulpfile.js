@@ -25,8 +25,32 @@ function ScriptTask () {
 			.pipe(gulp.dest(outline.dist + '/js/')).on('error', gutil.log);
 }
 
+var inject = require('gulp-inject');
+var htmlreplace = require('gulp-html-replace');
+var bowerFiles = require('main-bower-files');
+
+var jsBundle = outline.dist + '/js/' + withMinJS(outline.name);
+var cssBundle = outline.dist + '/css/' + withMinCSS(outline.name);
+
 function IndexTask () {
-	
+	var defaultInjectionOptions = {
+		addRootSlash: false,
+		ignorePath: '/' + outline.dist,
+		name: 'inject'
+	};
+
+	var bowerInjectionOptions = {
+		addRootSlash: false,
+		ignorePath: '/' + outline.dist,
+		name: 'bower'
+	};
+
+	return gulp.src(outline.src + '/html/index.html')
+  			.pipe(htmlreplace({'appTitle': outline.name}))
+  			.pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerInjectionOptions))
+  			.pipe(inject(gulp.src(jsBundle, {read: false}), defaultInjectionOptions))
+  			.pipe(inject(gulp.src(cssBundle, {read: false}), defaultInjectionOptions))
+  			.pipe(gulp.dest(outline.dist));
 }
 
 function ReloadBrowserTask () {
@@ -38,9 +62,9 @@ function WatchTask () {
 }
 
 function withMinJS (file) {
-	return file + ".min.js";
+	return file + '.min.js';
 }
 
 function withMinCSS (file) {
-	return file + ".min.css";
+	return file + '.min.css';
 }
