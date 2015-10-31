@@ -14,16 +14,28 @@ var concat = require('gulp-concat');
 var gutil = require('gulp-util');
 var browserSync = require('browser-sync');
 
+var args = require('yargs')
+  .alias('p', 'prod')
+  .default('prod', false)
+  .argv;
+
+var minifyCss = require('gulp-minify-css');
+var gulpif = require('gulp-if');
+
 function StyleTask () {
 	return gulp.src(outline.src + '/css/**/*.css')
 			.pipe(concat(withMinCSS(outline.name))).on('error', gutil.log)
+			.pipe(minifyCss()).on('error', gutil.log)
 			.pipe(gulp.dest(outline.dist + '/css/')).on('error', gutil.log)
 			.pipe(browserSync.stream());
 }
 
+var uglify = require('gulp-uglify');
+
 function ScriptTask () {
 	return gulp.src(outline.src + '/js/**/*.js')
 			.pipe(concat(withMinJS(outline.name))).on('error', gutil.log)
+			.pipe(gulpif(args.prod, uglify())).on('error', gutil.log)
 			.pipe(gulp.dest(outline.dist + '/js/')).on('error', gutil.log);
 }
 
