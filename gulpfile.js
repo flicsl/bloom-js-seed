@@ -3,20 +3,22 @@ var outline = require('./outline.json');
 
 gulp.task('default', ['build', 'watch']);
 gulp.task('build', ['style', 'script', 'index']);
-gulp.task('serve', ['start-server', 'watch']);
 gulp.task('watch', WatchTask);
 gulp.task('style', StyleTask);
 gulp.task('script', ScriptTask);
 gulp.task('index', IndexTask);
+gulp.task('start-server', StartServerTask);
 gulp.task('reload-browser', ReloadBrowserTask);
 
 var concat = require('gulp-concat');
 var gutil = require('gulp-util');
+var browserSync = require('browser-sync');
 
 function StyleTask () {
 	return gulp.src(outline.src + '/css/**/*.css')
 			.pipe(concat(withMinCSS(outline.name))).on('error', gutil.log)
-			.pipe(gulp.dest(outline.dist + '/css/')).on('error', gutil.log);
+			.pipe(gulp.dest(outline.dist + '/css/')).on('error', gutil.log)
+			.pipe(browserSync.stream());
 }
 
 function ScriptTask () {
@@ -54,11 +56,26 @@ function IndexTask () {
 }
 
 function ReloadBrowserTask () {
+	browserSync.reload();
+}
 
+var historyApiFallback = require('connect-history-api-fallback');
+function StartServerTask () {
+	browserSync.init({
+      server: {
+          baseDir: outline.dist,
+          middleware: [ historyApiFallback() ]
+      }
+  });
 }
 
 function WatchTask () {
+	StartServerTask();
 
+	gulp.watch(outline.src + '/js/**/*.js', ['script', 'reload-browser']);
+  	gulp.watch(outline.src + '/css/**/*.css', ['style']);
+  	gulp.watch(outline.src + '/html/**/*.html', ['index', 'reload-browser']);
+  	gulp.watch(outline.src + '/lib/**/*.{js,css}', ['index', 'reload-browser']);
 }
 
 function withMinJS (file) {

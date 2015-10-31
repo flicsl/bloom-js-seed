@@ -1,1 +1,1 @@
-console.log('Thats a good seed.');
+console.log('Thats a awesome seed.');
