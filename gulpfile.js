@@ -9,6 +9,9 @@ gulp.task('script', ScriptTask);
 gulp.task('index', IndexTask);
 gulp.task('start-server', StartServerTask);
 gulp.task('reload-browser', ReloadBrowserTask);
+gulp.task('prepare-tests', PrepareTestsTask);
+gulp.task('index-tests', IndexTestsTask);
+gulp.task('run-tests', RunTestsTask);
 
 var concat = require('gulp-concat');
 var gutil = require('gulp-util');
@@ -88,6 +91,33 @@ function WatchTask () {
   	gulp.watch(outline.src + '/css/**/*.css', ['style']);
   	gulp.watch(outline.src + '/html/**/*.html', ['index', 'reload-browser']);
   	gulp.watch(outline.src + '/lib/**/*.{js,css}', ['index', 'reload-browser']);
+}
+
+function PrepareTestsTask () {
+	return gulp.src(outline.test + '/**/*.test.js')
+		    .pipe(concat(outline.test + '/runnable/' + outline.name + '.test.js')).on('error', gutil.log)
+		    .pipe(gulp.dest(''));
+}
+
+function IndexTestsTask () {
+	var defaultTestInjectionOptions = {
+		    addRootSlash: false,
+		    relative: true,
+		    name: 'inject'
+	};
+	var bowerTestInjectionOptions = {
+		    addRootSlash: false,
+		    relative: true,
+		    name: 'bower'
+	};
+	return gulp.src(outline.test + '/unit/index.html')
+		  .pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerTestInjectionOptions))
+		  .pipe(inject(gulp.src(outline.dist + '/js/' + withMinJS(outline.name), {read: false}), defaultTestInjectionOptions))
+		  .pipe(gulp.dest(outline.test + '/runnable'));
+}
+
+function RunTestsTask () {
+	
 }
 
 function withMinJS (file) {
