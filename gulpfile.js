@@ -11,7 +11,7 @@ gulp.task('start-server', StartServerTask);
 gulp.task('reload-browser', ReloadBrowserTask);
 gulp.task('prepare-tests', PrepareTestsTask);
 gulp.task('index-tests', IndexTestsTask);
-gulp.task('run-tests', RunTestsTask);
+gulp.task('run-tests', ['prepare-tests', 'index-tests'], RunTestsTask);
 
 var concat = require('gulp-concat');
 var gutil = require('gulp-util');
@@ -94,7 +94,7 @@ function WatchTask () {
 }
 
 function PrepareTestsTask () {
-	return gulp.src(outline.test + '/**/*.test.js')
+	return gulp.src(outline.test + '/unit/**/*.test.js')
 		    .pipe(concat(outline.test + '/runnable/' + outline.name + '.test.js')).on('error', gutil.log)
 		    .pipe(gulp.dest(''));
 }
@@ -111,13 +111,17 @@ function IndexTestsTask () {
 		    name: 'bower'
 	};
 	return gulp.src(outline.test + '/unit/index.html')
-		  .pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerTestInjectionOptions))
-		  .pipe(inject(gulp.src(outline.dist + '/js/' + withMinJS(outline.name), {read: false}), defaultTestInjectionOptions))
-		  .pipe(gulp.dest(outline.test + '/runnable'));
+			.pipe(htmlreplace({'testFile': outline.name + '.test.js'}))
+			.pipe(inject(gulp.src(bowerFiles(), {read: false}), bowerTestInjectionOptions))
+			.pipe(inject(gulp.src(outline.dist + '/js/' + withMinJS(outline.name), {read: false}), defaultTestInjectionOptions))
+			.pipe(gulp.dest(outline.test + '/runnable'));
 }
 
+var mochaPhantomjs = require('gulp-mocha-phantomjs');
+
 function RunTestsTask () {
-	
+	return gulp.src(outline.test + '/runnable/index.html')
+    .pipe(mochaPhantomjs());
 }
 
 function withMinJS (file) {
