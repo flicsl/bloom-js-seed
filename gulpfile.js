@@ -87,7 +87,8 @@ function StartServerTask () {
 function WatchTask () {
 	StartServerTask();
 
-	gulp.watch(outline.src + '/js/**/*.js', ['script', 'reload-browser']);
+	gulp.watch(outline.src + '/js/**/*.js', ['script', 'reload-browser', 'run-tests']);
+	gulp.watch(outline.test + '/unit/**/*.test.js', ['run-tests']);
   	gulp.watch(outline.src + '/css/**/*.css', ['style']);
   	gulp.watch(outline.src + '/html/**/*.html', ['index', 'reload-browser']);
   	gulp.watch(outline.src + '/lib/**/*.{js,css}', ['index', 'reload-browser']);
