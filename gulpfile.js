@@ -22,11 +22,11 @@ function StyleTask () {
 function ScriptTask () {
 	return gulp.src(outline.src + '/js/**/*.js')
 			.pipe(concat(withMinJS(outline.name))).on('error', gutil.log)
-			.pipe(gulp.dest(outline.dist + '/css/')).on('error', gutil.log);
+			.pipe(gulp.dest(outline.dist + '/js/')).on('error', gutil.log);
 }
 
 function IndexTask () {
-
+	
 }
 
 function ReloadBrowserTask () {
