@@ -9,6 +9,6 @@
 - gulp script: Generates your project main script file by concatenating all files defined in your outline.
 - gulp index: Generates index.html files, loading your project name and dependencies from ```bower.json```.
 - gulp build [-p]: Setups the whole project structure by executing ```style```, ```script``` and ```index```, using data from your ```outline.json```. Use with -p to minify and uglify all assets, leaving them in a production-ready state.
-- gulp watch: Watches for changes on files, and executes the appropriate task. 
+- gulp watch: Builds and then watches for changes on files, and executes the appropriate task. 
 - gulp (default task): Executes gulp build followed by gulp watch.
 - gulp serve: Starts a live reload server, which will watch for changes on project files, rebuild your project and reload all connected browsers.
